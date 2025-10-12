@@ -1,0 +1,269 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17, 21]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Compile project
+      run: mvn clean compile
+      
+    - name: Run tests
+      run: mvn test
+      
+    - name: Generate test report
+      run: mvn surefire-report:report
+      if: always()
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-java-${{ matrix.java-version }}
+        path: target/surefire-reports/
+        
+  code-quality:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for better analysis
+        
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+        
+    - name: Run SpotBugs analysis
+      run: mvn spotbugs:check
+      continue-on-error: true
+      
+    - name: Run Checkstyle
+      run: mvn checkstyle:check
+      continue-on-error: true
+      
+    - name: Generate code coverage
+      run: mvn jacoco:prepare-agent test jacoco:report
+      
+    - name: SonarCloud Scan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn sonar:sonar
+      continue-on-error: true
+      
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: target/site/jacoco/
+        
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Run OWASP Dependency Check
+      run: mvn org.owasp:dependency-check-maven:check
+      continue-on-error: true
+      
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-scan-results
+        path: target/dependency-check-report.html
+        
+  build-and-package:
+    runs-on: ubuntu-latest
+    needs: [test, code-quality]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Build application
+      run: mvn clean package -DskipTests
+      
+    - name: Build executable JAR
+      run: mvn package assembly:single
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          target/*.jar
+          target/dependency-check-report.html
+        retention-days: 30
+        
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: build-and-package
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: target/
+        
+    - name: Test Call Graph Generation
+      run: |
+        java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestDotExport
+        ls -la *.dot *.json
+        
+    - name: Test Class Diagram Generation
+      run: |
+        java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestClassDiagramExport
+        ls -la *.puml *.json
+        
+    - name: Test Statistics Generation
+      run: |
+        java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestStatisticsExport
+        ls -la *.txt
+        
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: integration-test-outputs
+        path: |
+          *.dot
+          *.json
+          *.puml
+          *.txt
+          
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [integration-tests, security-scan]
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: target/
+        
+    - name: Create release archive
+      run: |
+        mkdir -p release/
+        cp target/*.jar release/
+        cp README.md release/ || echo "README.md not found"
+        cp *.md release/ || echo "No markdown files found"
+        tar -czf java-refactoring-tool-${{ github.event.release.tag_name }}.tar.gz release/
+        
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./java-refactoring-tool-${{ github.event.release.tag_name }}.tar.gz
+        asset_name: java-refactoring-tool-${{ github.event.release.tag_name }}.tar.gz
+        asset_content_type: application/gzip
+        
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, code-quality, security-scan, build-and-package, integration-tests]
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: ${{ needs.test.result == 'success' && needs.code-quality.result == 'success' && needs.build-and-package.result == 'success' }}
+      run: |
+        echo "✅ CI/CD Pipeline completed successfully!"
+        echo "All tests passed, code quality checks completed, and artifacts built."
+        
+    - name: Notify failure
+      if: ${{ needs.test.result == 'failure' || needs.code-quality.result == 'failure' || needs.build-and-package.result == 'failure' }}
+      run: |
+        echo "❌ CI/CD Pipeline failed!"
+        echo "Please check the logs for more details."
+        exit 1
