@@ -1,14 +1,17 @@
 package fr.jeremyhurel.ui;
 
-import fr.jeremyhurel.utils.Dialog;
-import fr.jeremyhurel.processors.ClassDiagramProcessor;
-import fr.jeremyhurel.models.ClassDiagram;
-import fr.jeremyhurel.utils.ClassDiagramExporter;
-import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
-import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import java.io.IOException;
+
+import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
+
+import fr.jeremyhurel.models.ClassDiagram;
+import fr.jeremyhurel.processors.ClassDiagramProcessor;
+import fr.jeremyhurel.utils.ClassDiagramExporter;
+import fr.jeremyhurel.utils.Dialog;
 
 public class ClassDiagramDialog implements Dialog {
 
@@ -100,18 +103,19 @@ public class ClassDiagramDialog implements Dialog {
                 return;
             }
 
-            // Show results and ask for export options
+            // Show results and ask for package encapsulation
             new MessageDialogBuilder()
                     .setTitle("Class Diagram Generated")
                     .setText("Class diagram generated successfully!\n" +
                             "Classes found: " + classDiagram.getClassCount() + "\n" +
+                            "Packages found: " + classDiagram.getPackageCount() + "\n" +
                             "Relationships: " + classDiagram.getRelationshipCount() + "\n" +
                             "Root package: "
                             + (classDiagram.getRootPackage() != null ? classDiagram.getRootPackage() : "All packages"))
                     .build()
                     .showDialog(gui);
 
-            askForExportOptions(classDiagram);
+            askForPackageEncapsulation(classDiagram);
 
         } catch (Exception e) {
             new MessageDialogBuilder()
@@ -120,6 +124,22 @@ public class ClassDiagramDialog implements Dialog {
                     .build()
                     .showDialog(gui);
         }
+    }
+
+    private void askForPackageEncapsulation(ClassDiagram classDiagram) {
+        new ActionListDialogBuilder()
+                .setTitle("Package Encapsulation")
+                .setDescription("Group classes by package in diagram?")
+                .addAction("Yes - Show packages", () -> {
+                    classDiagram.setPackageEncapsulation(true);
+                    askForExportOptions(classDiagram);
+                })
+                .addAction("No - Flat structure", () -> {
+                    classDiagram.setPackageEncapsulation(false);
+                    askForExportOptions(classDiagram);
+                })
+                .build()
+                .showDialog(gui);
     }
 
     private void askForExportOptions(ClassDiagram classDiagram) {

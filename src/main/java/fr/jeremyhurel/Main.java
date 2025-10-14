@@ -15,8 +15,9 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
-import fr.jeremyhurel.ui.ClassDiagramDialog;
 import fr.jeremyhurel.ui.CalleeGraphDialog;
+import fr.jeremyhurel.ui.ClassDiagramDialog;
+import fr.jeremyhurel.ui.CouplingGraphDialog;
 import fr.jeremyhurel.ui.StatsDialog;
 
 public class Main {
@@ -46,9 +47,10 @@ public class Main {
 
         menu.addItem("1. Class Diagram", () -> showClassDiagram(gui));
         menu.addItem("2. Called Graph", () -> showCalledGraph(gui));
-        menu.addItem("3. Stats", () -> showStats(gui));
-        menu.addItem("4. Help", () -> showHelp(gui));
-        menu.addItem("5. Exit", window::close);
+        menu.addItem("3. Coupling Graph", () -> showCouplingGraph(gui));
+        menu.addItem("4. Stats", () -> showStats(gui));
+        menu.addItem("5. Help", () -> showHelp(gui));
+        menu.addItem("6. Exit", window::close);
 
         panel.addComponent(menu);
 
@@ -68,6 +70,11 @@ public class Main {
         dialog.show();
     }
 
+    private void showCouplingGraph(MultiWindowTextGUI gui) {
+        CouplingGraphDialog dialog = new CouplingGraphDialog(gui);
+        dialog.show();
+    }
+
     private void showStats(MultiWindowTextGUI gui) {
         StatsDialog dialog = new StatsDialog(gui);
         dialog.show();
@@ -81,9 +88,10 @@ public class Main {
 
                         1. Class Diagram - Analyze and visualize class relationships
                         2. Called Graph - Show method call dependencies
-                        3. Stats - Display code metrics and statistics
-                        4. Help - Show this help information
-                        5. Exit - Close the application""")
+                        3. Coupling Graph - Analyze class coupling and dependencies
+                        4. Stats - Display code metrics and statistics
+                        5. Help - Show this help information
+                        6. Exit - Close the application""")
                 .build()
                 .showDialog(gui);
     }

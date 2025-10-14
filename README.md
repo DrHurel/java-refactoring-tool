@@ -17,12 +17,25 @@ A comprehensive Java analysis tool that generates call graphs, class diagrams, a
 
 ### 📊 Class Diagram Generation
 - Generate UML class diagrams from Java source code
-- Export to **PlantUML** format for professional diagrams
+- Export to **PlantUML** format for professional diagrams with color-coding
 - Export to **JSON** format for data analysis
 - Detect relationships: inheritance, implementation, composition, aggregation
 - Analyze attributes, methods, and constructors
+- **Package encapsulation**: Group classes by package structure
+- **Color-coded output**: Interfaces (blue), Abstract classes (yellow), Concrete classes (green)
 
-### 📈 Project Statistics
+### � Coupling Graph Analysis
+- Analyze coupling relationships between classes based on method calls
+- Calculate normalized coupling using formula: `Couplage(A,B) = Calls(A→B) / Total Calls`
+- Filter external libraries (Java stdlib, frameworks, third-party)
+- Export to **JSON** and **DOT** formats
+- **Hierarchical Cluster Tree**: Generate dendrograms showing class groupings
+  - Agglomerative clustering with average linkage
+  - Export to JSON, DOT, Text, and Newick formats
+  - Identify natural module boundaries
+  - Support refactoring decisions
+
+### �📈 Project Statistics
 - **13 comprehensive metrics** including:
   - Number of classes, methods, packages
   - Lines of code analysis
@@ -80,7 +93,11 @@ java -jar target/java-refactoring-tool-1.0-SNAPSHOT-jar-with-dependencies.jar
 - **JSON Format**: Machine-readable data structure
 
 ### Class Diagrams
-- **PlantUML Format**: Standard UML diagram syntax
+- **PlantUML Format**: Standard UML diagram syntax with automatic color-coding
+  - Interfaces: Light blue background
+  - Abstract classes: Light yellow background
+  - Concrete classes: Light green background
+  - Packages: WhiteSmoke background with gray borders
 - **JSON Format**: Structured class information
 
 ### Statistics
