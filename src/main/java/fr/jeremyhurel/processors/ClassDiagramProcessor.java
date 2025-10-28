@@ -1,59 +1,43 @@
 package fr.jeremyhurel.processors;
 
+import fr.jeremyhurel.models.class_models.ClassDiagram;
+import fr.jeremyhurel.scanners.ClassDiagramScanner;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
-import fr.jeremyhurel.models.ClassDiagram;
-import fr.jeremyhurel.scanners.ClassDiagramScanner;
 
-public class ClassDiagramProcessor {
+public class ClassDiagramProcessor extends BaseProcessor {
 
-    private String projectPath;
     private String rootPackage;
 
     public ClassDiagramProcessor(String projectPath) {
-        this.projectPath = projectPath;
+        super(projectPath);
     }
 
     public ClassDiagramProcessor(String projectPath, String rootPackage) {
-        this.projectPath = projectPath;
+        super(projectPath);
         this.rootPackage = rootPackage;
     }
 
     public ClassDiagram generateClassDiagram() {
         ClassDiagram classDiagram = new ClassDiagram();
 
-        // Create Spoon launcher
-        Launcher launcher = new Launcher();
-        launcher.addInputResource(projectPath);
-        launcher.getEnvironment().setAutoImports(true);
-        launcher.getEnvironment().setCommentEnabled(false);
-        launcher.getEnvironment().setNoClasspath(true);
+        Launcher launcher = createLauncher();
+        CtModel model = buildModel(launcher);
 
-        // Build the model
-        CtModel model = launcher.buildModel();
+        ClassDiagramScanner scanner = createScanner(classDiagram);
 
-        // Create and add the scanner
-        ClassDiagramScanner scanner;
-        if (rootPackage != null) {
-            scanner = new ClassDiagramScanner(classDiagram, rootPackage);
-            classDiagram.setRootPackage(rootPackage);
-        } else {
-            scanner = new ClassDiagramScanner(classDiagram);
-        }
-
-        // Process the model
         scanner.setFactory(launcher.getFactory());
         model.getAllTypes().forEach(scanner::process);
 
         return classDiagram;
     }
 
-    public String getProjectPath() {
-        return projectPath;
-    }
-
-    public void setProjectPath(String projectPath) {
-        this.projectPath = projectPath;
+    private ClassDiagramScanner createScanner(ClassDiagram classDiagram) {
+        if (rootPackage != null) {
+            classDiagram.setRootPackage(rootPackage);
+            return new ClassDiagramScanner(classDiagram, rootPackage);
+        }
+        return new ClassDiagramScanner(classDiagram);
     }
 
     public String getRootPackage() {
