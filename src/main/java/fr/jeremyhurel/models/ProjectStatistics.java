@@ -1,31 +1,28 @@
 package fr.jeremyhurel.models;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import fr.jeremyhurel.models.class_models.ClassStats;
 
 public class ProjectStatistics {
 
-    // Basic counts
     private int totalClasses;
     private int totalLinesOfCode;
     private int totalMethods;
     private int totalPackages;
 
-    // Averages
     private double averageMethodsPerClass;
     private double averageLinesPerMethod;
     private double averageAttributesPerClass;
 
-    // Top percentiles
     private List<ClassStats> top10PercentClassesByMethods;
     private List<ClassStats> top10PercentClassesByAttributes;
     private List<ClassStats> classesInBothTopCategories;
 
-    // Custom threshold
     private List<ClassStats> classesWithMoreThanXMethods;
     private int methodThreshold;
 
-    // Method statistics
     private List<MethodStats> top10PercentMethodsByLines;
     private int maxParametersInApplication;
 
@@ -37,7 +34,6 @@ public class ProjectStatistics {
         this.top10PercentMethodsByLines = new ArrayList<>();
     }
 
-    // Getters and setters
     public int getTotalClasses() {
         return totalClasses;
     }
