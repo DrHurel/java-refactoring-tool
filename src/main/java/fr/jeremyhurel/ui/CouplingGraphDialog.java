@@ -79,14 +79,13 @@ public class CouplingGraphDialog implements Dialog {
 
     private void generateCouplingGraph() {
         try {
-            // Show progress dialog
+
             new MessageDialogBuilder()
                     .setTitle("Generating Coupling Graph")
                     .setText("Analyzing project coupling... Please wait.")
                     .build()
                     .showDialog(gui);
 
-            // Create processor and generate coupling graph
             CouplingGraphProcessor processor;
             if (rootPackage != null) {
                 processor = new CouplingGraphProcessor(projectPath, rootPackage);
@@ -105,7 +104,6 @@ public class CouplingGraphDialog implements Dialog {
                 return;
             }
 
-            // Show results and ask for export options
             new MessageDialogBuilder()
                     .setTitle("Coupling Graph Generated")
                     .setText("Coupling graph generated successfully!\n\n" +
@@ -180,17 +178,15 @@ public class CouplingGraphDialog implements Dialog {
 
     private void generateAndExportClusterTree(CouplingGraph couplingGraph, CouplingGraphProcessor processor) {
         try {
-            // Show progress
+
             new MessageDialogBuilder()
                     .setTitle("Generating Cluster Tree")
                     .setText("Building hierarchical cluster tree... Please wait.")
                     .build()
                     .showDialog(gui);
 
-            // Generate cluster tree
             ClusterTree clusterTree = processor.generateClusterTree(couplingGraph);
 
-            // Show results
             new MessageDialogBuilder()
                     .setTitle("Cluster Tree Generated")
                     .setText("Hierarchical cluster tree generated successfully!\n\n" +

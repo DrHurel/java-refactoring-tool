@@ -85,21 +85,18 @@ public class StatsDialog implements Dialog {
 
     private void generateStatistics() {
         try {
-            // Show progress dialog
+
             new MessageDialogBuilder()
                     .setTitle("Generating Statistics")
                     .setText("Analyzing project... Please wait.")
                     .build()
                     .showDialog(gui);
 
-            // Create processor and generate statistics
             StatisticsProcessor processor = new StatisticsProcessor(projectPath);
             ProjectStatistics stats = processor.generateStatistics(methodThreshold);
 
-            // Display statistics in terminal UI
             showStatisticsInUI(stats);
 
-            // Ask for export
             askForExportOptions(stats);
 
         } catch (Exception e) {
@@ -112,26 +109,22 @@ public class StatsDialog implements Dialog {
     }
 
     private void showStatisticsInUI(ProjectStatistics stats) {
-        // Create a window to display statistics
+
         BasicWindow statsWindow = new BasicWindow("Project Statistics");
         statsWindow.setHints(java.util.Arrays.asList(Window.Hint.CENTERED));
 
         Panel mainPanel = new Panel(new GridLayout(1));
 
-        // Create scrollable text area for statistics
         String statisticsText = StatisticsExporter.formatStatisticsForDisplay(stats);
 
-        // Create a multi-line label to display the statistics
         Panel textPanel = new Panel(new GridLayout(1));
         String[] lines = statisticsText.split("\n");
         for (String line : lines) {
             textPanel.addComponent(new Label(line));
         }
 
-        // Wrap in a scrollable panel
         mainPanel.addComponent(textPanel.withBorder(Borders.singleLine("Statistics")));
 
-        // Add close button
         Button closeButton = new Button("Close", statsWindow::close);
         mainPanel.addComponent(closeButton);
 

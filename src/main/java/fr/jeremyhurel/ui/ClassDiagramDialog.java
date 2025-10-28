@@ -8,7 +8,7 @@ import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 
-import fr.jeremyhurel.models.ClassDiagram;
+import fr.jeremyhurel.models.class_models.ClassDiagram;
 import fr.jeremyhurel.processors.ClassDiagramProcessor;
 import fr.jeremyhurel.utils.ClassDiagramExporter;
 import fr.jeremyhurel.utils.Dialog;
@@ -77,14 +77,13 @@ public class ClassDiagramDialog implements Dialog {
 
     private void generateClassDiagram() {
         try {
-            // Show progress dialog
+
             new MessageDialogBuilder()
                     .setTitle("Generating Class Diagram")
                     .setText("Analyzing project structure... Please wait.")
                     .build()
                     .showDialog(gui);
 
-            // Create processor and generate class diagram
             ClassDiagramProcessor processor;
             if (rootPackage != null) {
                 processor = new ClassDiagramProcessor(projectPath, rootPackage);
@@ -103,7 +102,6 @@ public class ClassDiagramDialog implements Dialog {
                 return;
             }
 
-            // Show results and ask for package encapsulation
             new MessageDialogBuilder()
                     .setTitle("Class Diagram Generated")
                     .setText("Class diagram generated successfully!\n" +

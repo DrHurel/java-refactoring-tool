@@ -98,14 +98,13 @@ public class CalleeGraphDialog implements Dialog {
 
     private void generateCallGraph() {
         try {
-            // Show progress dialog
+
             new MessageDialogBuilder()
                     .setTitle("Generating Call Graph")
                     .setText("Analyzing project... Please wait.")
                     .build()
                     .showDialog(gui);
 
-            // Create processor and generate call graph
             CallGraphProcessor processor;
             if (rootClassName != null && rootMethodName != null) {
                 processor = new CallGraphProcessor(projectPath, rootClassName, rootMethodName);
@@ -124,7 +123,6 @@ public class CalleeGraphDialog implements Dialog {
                 return;
             }
 
-            // Show results and ask for export options
             new MessageDialogBuilder()
                     .setTitle("Call Graph Generated")
                     .setText("Call graph generated successfully!\n" +
