@@ -1,8 +1,8 @@
 # Java Refactoring & Analysis Tool 🚀
 
-[![CI/CD Pipeline](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/ci-cd.yml)
-[![Code Quality & Security](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/quality-security.yml/badge.svg)](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/quality-security.yml)
-[![codecov](https://codecov.io/gh/jeremyhurel/java-refactoring-tool/branch/main/graph/badge.svg)](https://codecov.io/gh/jeremyhurel/java-refactoring-tool)
+[![CI/CD Pipeline](https://github.com/Drhurel/java-refactoring-tool/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Drhurel/java-refactoring-tool/actions/workflows/ci-cd.yml)
+[![Code Quality & Security](https://github.com/Drhurel/java-refactoring-tool/actions/workflows/quality-security.yml/badge.svg)](https://github.com/Drhurel/java-refactoring-tool/actions/workflows/quality-security.yml)
+[![codecov](https://codecov.io/gh/Drhurel/java-refactoring-tool/branch/main/graph/badge.svg)](https://codecov.io/gh/Drhurel/java-refactoring-tool)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeremyhurel_java-refactoring-tool&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeremyhurel_java-refactoring-tool)
 
 A comprehensive Java analysis tool with a **beautiful terminal UI** that generates call graphs, class diagrams, coupling analysis, and intelligent module extraction using the Spoon framework.
@@ -87,7 +87,7 @@ A comprehensive Java analysis tool with a **beautiful terminal UI** that generat
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/jeremyhurel/java-refactoring-tool.git
+git clone https://github.com/Drhurel/java-refactoring-tool.git
 cd java-refactoring-tool
 ```
 
@@ -187,7 +187,7 @@ Our project uses a comprehensive CI/CD pipeline with the following features:
 
 1. **Clone and Setup**:
 ```bash
-git clone https://github.com/jeremyhurel/java-refactoring-tool.git
+git clone https://github.com/Drhurel/java-refactoring-tool.git
 cd java-refactoring-tool
 mvn clean compile
 ```
@@ -232,7 +232,7 @@ mvn jacoco:report
 
 ### Project Structure
 ```
-src/main/java/fr/jeremyhurel/
+src/main/java/fr/Drhurel/
 ├── Main.java                 # Application entry point
 ├── models/                   # Data models
 ├── processors/               # Analysis processors
@@ -283,6 +283,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- 📧 Issues: [GitHub Issues](https://github.com/jeremyhurel/java-refactoring-tool/issues)
-- 📚 Documentation: [Wiki](https://github.com/jeremyhurel/java-refactoring-tool/wiki)
-- 💬 Discussions: [GitHub Discussions](https://github.com/jeremyhurel/java-refactoring-tool/discussions)
+- 📧 Issues: [GitHub Issues](https://github.com/Drhurel/java-refactoring-tool/issues)
+- 📚 Documentation: [Wiki](https://github.com/Drhurel/java-refactoring-tool/wiki)
+- 💬 Discussions: [GitHub Discussions](https://github.com/Drhurel/java-refactoring-tool/discussions)

@@ -40,7 +40,7 @@ By participating in this project, you agree to abide by our Code of Conduct:
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/jeremyhurel/java-refactoring-tool.git
+   git remote add upstream https://github.com/Drhurel/java-refactoring-tool.git
    ```
 4. **Build the project**:
    ```bash

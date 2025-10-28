@@ -333,7 +333,7 @@ Goal: Create project documentation
 1. **In-App Help**: Press "❓ Help" in main menu
 2. **Documentation**: See `UI_IMPROVEMENTS.md`
 3. **Strategy Guide**: See `STRATEGY_MERGE.md`
-4. **GitHub**: https://github.com/DrHurel/java-refactoring-tool
+4. **GitHub**: https://github.com//Drhurel//java-refactoring-tool
 
 ---
 
