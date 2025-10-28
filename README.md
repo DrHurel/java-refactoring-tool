@@ -93,7 +93,7 @@ cd java-refactoring-tool
 
 2. Build and run with the convenient script:
 ```bash
-./run.sh
+./Devtools/run.sh
 ```
 
 Or manually:
@@ -104,16 +104,16 @@ java -jar target/java-refactoring-tool-1.1-SNAPSHOT-jar-with-dependencies.jar
 
 ### Run Commands
 
-The project includes a convenient `run.sh` script for all common operations:
+The project includes a convenient `Devtools/run.sh` script for all common operations:
 
 ```bash
-./run.sh              # Run the application (builds if needed)
-./run.sh build        # Build the project
-./run.sh test         # Run tests
-./run.sh export       # Generate test exports
-./run.sh visualize    # Create PNG/SVG from DOT files
-./run.sh full         # Complete workflow (clean, build, test, export, visualize)
-./run.sh help         # Show all available commands
+./Devtools/run.sh              # Run the application (builds if needed)
+./Devtools/run.sh build        # Build the project
+./Devtools/run.sh test         # Run tests
+./Devtools/run.sh export       # Generate test exports
+./Devtools/run.sh visualize    # Create PNG/SVG from DOT files
+./Devtools/run.sh full         # Complete workflow (clean, build, test, export, visualize)
+./Devtools/run.sh help         # Show all available commands
 ```
 
 See [RUN_COMMANDS.md](RUN_COMMANDS.md) for complete documentation.
@@ -122,19 +122,19 @@ See [RUN_COMMANDS.md](RUN_COMMANDS.md) for complete documentation.
 
 1. **Interactive Mode**: Run the application and use the terminal UI
    ```bash
-   ./run.sh
+   ./Devtools/run.sh
    ```
 
 2. **Command Line Examples**:
    ```bash
    # Generate test exports
-   ./run.sh export
+   ./Devtools/run.sh export
    
    # Create visualizations
-   ./run.sh visualize
+   ./Devtools/run.sh visualize
    
    # Complete workflow
-   ./run.sh full
+   ./Devtools/run.sh full
    ```
 
 ## Output Formats

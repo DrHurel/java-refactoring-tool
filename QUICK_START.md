@@ -8,7 +8,7 @@
 mvn exec:java -Dexec.mainClass="fr.jeremyhurel.Main"
 
 # Or using the run script
-./run.sh
+./Devtools/run.sh
 ```
 
 ---
