@@ -7,9 +7,9 @@ import java.util.Set;
 public class CouplingGraph {
 
     private final Map<String, CouplingNode> nodes;
-    // Raw count matrix: from class -> to class -> number of method calls
+
     private final Map<String, Map<String, Integer>> callCountMatrix;
-    // Normalized coupling matrix: from class -> to class -> coupling value [0,1]
+
     private final Map<String, Map<String, Double>> couplingMatrix;
     private int totalMethodCalls = 0;
 
@@ -36,13 +36,6 @@ public class CouplingGraph {
         return node;
     }
 
-    /**
-     * Adds a method call relation between two classes.
-     * This increments the count of method calls from class 'from' to class 'to'.
-     * 
-     * @param from the calling class
-     * @param to the called class
-     */
     public void addMethodCall(String from, String to) {
         callCountMatrix.putIfAbsent(from, new HashMap<>());
         Map<String, Integer> row = callCountMatrix.get(from);
@@ -50,36 +43,37 @@ public class CouplingGraph {
         totalMethodCalls++;
     }
 
-    /**
-     * Calculates normalized coupling values based on the formula:
-     * Couplage(A,B) = Number of method calls between A and B / Total method calls in application
-     */
     public void calculateNormalizedCoupling() {
         couplingMatrix.clear();
-        
+
         if (totalMethodCalls == 0) {
-            return; // Avoid division by zero
+            return;
         }
 
         for (Map.Entry<String, Map<String, Integer>> entry : callCountMatrix.entrySet()) {
             String fromClass = entry.getKey();
             couplingMatrix.putIfAbsent(fromClass, new HashMap<>());
-            
+
+            float totalOutgoingCoupling = 0.0f;
+
             for (Map.Entry<String, Integer> callEntry : entry.getValue().entrySet()) {
                 String toClass = callEntry.getKey();
                 int callCount = callEntry.getValue();
                 double normalizedCoupling = (double) callCount / totalMethodCalls;
                 couplingMatrix.get(fromClass).put(toClass, normalizedCoupling);
+                totalOutgoingCoupling += (float) normalizedCoupling;
+            }
+
+            CouplingNode node = nodes.get(fromClass);
+            if (node != null) {
+                node.setCouplingValue(totalOutgoingCoupling);
             }
         }
     }
 
-    /**
-     * @deprecated Use addMethodCall() instead
-     */
     @Deprecated
     public void addCoupling(String from, String to, double weight) {
-        // For backward compatibility, convert weight to call count
+
         int callCount = (int) Math.round(weight * 10);
         for (int i = 0; i < callCount; i++) {
             addMethodCall(from, to);
@@ -101,16 +95,10 @@ public class CouplingGraph {
         return nodes;
     }
 
-    /**
-     * Returns the raw call count matrix (before normalization)
-     */
     public Map<String, Map<String, Integer>> getCallCountMatrix() {
         return callCountMatrix;
     }
 
-    /**
-     * Returns the normalized coupling matrix (after calling calculateNormalizedCoupling())
-     */
     public Map<String, Map<String, Double>> getCouplingMatrix() {
         return couplingMatrix;
     }
@@ -127,16 +115,10 @@ public class CouplingGraph {
         return count;
     }
 
-    /**
-     * Returns the total number of method calls in the application
-     */
     public int getTotalMethodCalls() {
         return totalMethodCalls;
     }
 
-    /**
-     * Returns the raw call count between two classes
-     */
     public int getCallCount(String from, String to) {
         if (callCountMatrix.containsKey(from) && callCountMatrix.get(from).containsKey(to)) {
             return callCountMatrix.get(from).get(to);
@@ -148,14 +130,32 @@ public class CouplingGraph {
         return nodes.isEmpty();
     }
 
-    /**
-     * Removes nodes that are not part of the analyzed codebase.
-     * This is useful for cleaning up external library classes that were referenced
-     * but are not in the main coupling matrix as source classes.
-     */
     public void removeOrphanedNodes() {
-        // Remove nodes that don't have any outgoing couplings
-        // (they are only referenced but not part of the analyzed codebase)
+
         nodes.keySet().removeIf(className -> !callCountMatrix.containsKey(className));
+    }
+
+    public CouplingNode mergeNodes(String node1, String node2) {
+        CouplingNode n1 = nodes.get(node1);
+        CouplingNode n2 = nodes.get(node2);
+
+        if (n1 == null || n2 == null) {
+            throw new IllegalArgumentException("Both nodes must exist in the graph");
+        }
+
+        return n1.merge(n2);
+    }
+
+    public float getNodeCouplingValue(String className) {
+        CouplingNode node = nodes.get(className);
+        return node != null ? node.getCouplingValue() : 0.0f;
+    }
+
+    public Map<String, Float> getNodeCouplingValues() {
+        Map<String, Float> result = new HashMap<>();
+        for (Map.Entry<String, CouplingNode> entry : nodes.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().getCouplingValue());
+        }
+        return result;
     }
 }
