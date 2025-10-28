@@ -1,16 +1,19 @@
 package fr.jeremyhurel.utils;
 
-import fr.jeremyhurel.models.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+
+import fr.jeremyhurel.models.MethodStats;
+import fr.jeremyhurel.models.ProjectStatistics;
+import fr.jeremyhurel.models.class_models.ClassStats;
 
 public class StatisticsExporter {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     private StatisticsExporter() {
-        // Private constructor to hide implicit public one
+
     }
 
     public static void exportToText(ProjectStatistics stats, String filePath) throws IOException {
@@ -24,7 +27,6 @@ public class StatisticsExporter {
         writer.write("RAPPORT STATISTIQUES DU PROJET JAVA\n");
         writer.write("=".repeat(80) + "\n\n");
 
-        // Section 1-7: Basic statistics
         writer.write("STATISTIQUES GENERALES\n");
         writer.write("-".repeat(30) + "\n");
         writer.write("1. Nombre de classes de l'application: " + stats.getTotalClasses() + "\n");
@@ -38,7 +40,6 @@ public class StatisticsExporter {
         writer.write("7. Nombre moyen d'attributs par classe: "
                 + DECIMAL_FORMAT.format(stats.getAverageAttributesPerClass()) + "\n\n");
 
-        // Section 8: Top 10% classes by methods
         writer.write("8. LES 10% DES CLASSES AVEC LE PLUS DE METHODES\n");
         writer.write("-".repeat(50) + "\n");
         for (ClassStats cls : stats.getTop10PercentClassesByMethods()) {
@@ -46,7 +47,6 @@ public class StatisticsExporter {
         }
         writer.write("\n");
 
-        // Section 9: Top 10% classes by attributes
         writer.write("9. LES 10% DES CLASSES AVEC LE PLUS D'ATTRIBUTS\n");
         writer.write("-".repeat(50) + "\n");
         for (ClassStats cls : stats.getTop10PercentClassesByAttributes()) {
@@ -54,7 +54,6 @@ public class StatisticsExporter {
         }
         writer.write("\n");
 
-        // Section 10: Classes in both categories
         writer.write("10. CLASSES DANS LES DEUX CATEGORIES PRECEDENTES\n");
         writer.write("-".repeat(50) + "\n");
         if (stats.getClassesInBothTopCategories().isEmpty()) {
@@ -67,7 +66,6 @@ public class StatisticsExporter {
         }
         writer.write("\n");
 
-        // Section 11: Classes with more than X methods
         writer.write("11. CLASSES AVEC PLUS DE " + stats.getMethodThreshold() + " METHODES\n");
         writer.write("-".repeat(50) + "\n");
         if (stats.getClassesWithMoreThanXMethods().isEmpty()) {
@@ -79,7 +77,6 @@ public class StatisticsExporter {
         }
         writer.write("\n");
 
-        // Section 12: Top 10% methods by lines of code
         writer.write("12. LES 10% DES METHODES AVEC LE PLUS DE LIGNES\n");
         writer.write("-".repeat(50) + "\n");
         for (MethodStats method : stats.getTop10PercentMethodsByLines()) {
@@ -87,7 +84,6 @@ public class StatisticsExporter {
         }
         writer.write("\n");
 
-        // Section 13: Maximum parameters
         writer.write("13. NOMBRE MAXIMAL DE PARAMETRES\n");
         writer.write("-".repeat(50) + "\n");
         writer.write("   Le nombre maximal de paramètres dans l'application: " + stats.getMaxParametersInApplication()

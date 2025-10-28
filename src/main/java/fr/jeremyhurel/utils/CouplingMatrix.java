@@ -12,9 +12,6 @@ public class CouplingMatrix {
         this._matrix = new HashMap<>();
     }
 
-    /**
-     * @deprecated Use CouplingMatrix() instead. Size is now dynamic.
-     */
     @Deprecated
     public CouplingMatrix(int size) {
         this._matrix = new HashMap<>(size);
@@ -30,21 +27,10 @@ public class CouplingMatrix {
         return _matrix;
     }
 
-    /**
-     * Returns the dynamic size of the matrix (number of source nodes).
-     * 
-     * @return the number of classes/nodes with outgoing couplings
-     */
     public int get_size() {
         return _matrix.size();
     }
 
-    /**
-     * Returns the total number of nodes (classes) in the matrix.
-     * This includes both source and target nodes.
-     * 
-     * @return the total number of unique classes in the coupling matrix
-     */
     public int getTotalNodeCount() {
         Set<String> allNodes = new java.util.HashSet<>(_matrix.keySet());
         for (Map<String, Double> targets : _matrix.values()) {
