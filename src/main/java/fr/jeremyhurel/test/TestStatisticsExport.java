@@ -7,14 +7,12 @@ import fr.jeremyhurel.utils.StatisticsExporter;
 public class TestStatisticsExport {
     public static void main(String[] args) {
         try {
-            // Generate statistics for the project
+
             StatisticsProcessor processor = new StatisticsProcessor("./src/main/java");
             ProjectStatistics stats = processor.generateStatistics(5);
 
-            // Export to text file
             StatisticsExporter.exportToText(stats, "./test-statistics.txt");
 
-            // Display some key statistics in console
             System.out.println("Statistiques du projet exportées avec succès!");
             System.out.println("Classes trouvées: " + stats.getTotalClasses());
             System.out.println("Méthodes trouvées: " + stats.getTotalMethods());

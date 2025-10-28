@@ -7,11 +7,10 @@ import fr.jeremyhurel.utils.CallGraphExporter;
 public class TestDotExport {
     public static void main(String[] args) {
         try {
-            // Generate call graph for the test sample
+
             CallGraphProcessor processor = new CallGraphProcessor("./src/main/java");
             CallGraph callGraph = processor.generateCallGraph();
 
-            // Export to DOT format
             CallGraphExporter.exportToDot(callGraph, "./test-callgraph.dot");
             CallGraphExporter.exportToJson(callGraph, "./test-callgraph.json");
 

@@ -11,7 +11,6 @@ public class TestClusterTreeExport {
         try {
             System.out.println("=== Cluster Tree Generation Test ===\n");
 
-            // Test on this project itself
             String projectPath = "./src/main/java";
             String rootPackage = "fr.jeremyhurel";
 
@@ -19,7 +18,6 @@ public class TestClusterTreeExport {
             System.out.println("Root package: " + rootPackage);
             System.out.println("\nGenerating coupling graph...");
 
-            // Generate coupling graph
             CouplingGraphProcessor processor = new CouplingGraphProcessor(projectPath, rootPackage);
             CouplingGraph couplingGraph = processor.generateCouplingGraph();
 
@@ -34,13 +32,11 @@ public class TestClusterTreeExport {
 
             System.out.println("\nBuilding hierarchical cluster tree...");
 
-            // Generate cluster tree
             ClusterTree clusterTree = processor.generateClusterTree(couplingGraph);
 
             System.out.println("Tree depth: " + clusterTree.getDepth());
             System.out.println("Merge steps: " + clusterTree.getMergeHistory().size());
 
-            // Export to all formats
             System.out.println("\nExporting cluster tree...");
 
             ClusterTreeExporter.exportToJson(clusterTree, "clustertree.json");
