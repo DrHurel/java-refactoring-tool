@@ -1,21 +1,25 @@
-# Java Refactoring Tool
+# Java Refactoring & Analysis Tool 🚀
 
 [![CI/CD Pipeline](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/ci-cd.yml)
 [![Code Quality & Security](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/quality-security.yml/badge.svg)](https://github.com/jeremyhurel/java-refactoring-tool/actions/workflows/quality-security.yml)
 [![codecov](https://codecov.io/gh/jeremyhurel/java-refactoring-tool/branch/main/graph/badge.svg)](https://codecov.io/gh/jeremyhurel/java-refactoring-tool)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeremyhurel_java-refactoring-tool&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeremyhurel_java-refactoring-tool)
 
-A comprehensive Java analysis tool that generates call graphs, class diagrams, and project statistics using Spoon framework and terminal-based UI.
+A comprehensive Java analysis tool with a **beautiful terminal UI** that generates call graphs, class diagrams, coupling analysis, and intelligent module extraction using the Spoon framework.
 
-## Features
+## ✨ What's New in v1.1
 
-### 🔄 Call Graph Generation
-- Analyze method call relationships across your Java project
-- Export to **Graphviz DOT** format for visualization
-- Export to **JSON** format for programmatic analysis
-- Support for filtering by root class/method
+- 🎨 **Completely redesigned UI** with emoji icons and professional styling
+- ⚖️ **New Combined Strategy** for module extraction (Fixed Count + Threshold)
+- 📊 **Enhanced results display** with detailed module breakdowns
+- 🔄 **Step-by-step workflow** with progress indicators
+- 📚 **Comprehensive in-app help** documentation
+- ✅ **Better error messages** with helpful guidance
+- 🎯 **Parameter recommendations** for all strategies
 
-### 📊 Class Diagram Generation
+## 🎯 Features
+
+### � Class Diagram Generation
 - Generate UML class diagrams from Java source code
 - Export to **PlantUML** format for professional diagrams with color-coding
 - Export to **JSON** format for data analysis
@@ -24,16 +28,41 @@ A comprehensive Java analysis tool that generates call graphs, class diagrams, a
 - **Package encapsulation**: Group classes by package structure
 - **Color-coded output**: Interfaces (blue), Abstract classes (yellow), Concrete classes (green)
 
-### � Coupling Graph Analysis
+### 🔗 Call Graph Analysis
+- Analyze method call relationships across your Java project
+- Export to **Graphviz DOT** format for visualization
+- Export to **JSON** format for programmatic analysis
+- Support for filtering by root class/method
+- Identify call chains and dependencies
+
+### 🔄 Coupling Graph Analysis
 - Analyze coupling relationships between classes based on method calls
 - Calculate normalized coupling using formula: `Couplage(A,B) = Calls(A→B) / Total Calls`
 - Filter external libraries (Java stdlib, frameworks, third-party)
 - Export to **JSON** and **DOT** formats
+- **Node Coupling Values**: Each node stores its total outgoing coupling strength
+- **Node Merging**: Support for combining nodes (useful for clustering)
 - **Hierarchical Cluster Tree**: Generate dendrograms showing class groupings
   - Agglomerative clustering with average linkage
   - Export to JSON, DOT, Text, and Newick formats
   - Identify natural module boundaries
   - Support refactoring decisions
+- See [COUPLING_NODE_FEATURES.md](COUPLING_NODE_FEATURES.md) for detailed documentation
+
+### 📦 Module Extraction ⭐ (Enhanced in v1.1)
+- **Automatic module detection** from coupling analysis using hierarchical clustering
+- **Four clustering strategies**:
+  - 🤖 **Automatic Elbow Method**: Intelligently determines optimal module count
+  - 🎯 **Fixed Count**: Extract exactly N modules (user-specified)
+  - 📊 **Coupling Threshold**: Split based on minimum coupling strength
+  - ⚖️ **Combined** (NEW): Mix fixed count with threshold for controlled extraction
+- **Export formats**:
+  - **Text**: Human-readable module listings with statistics
+  - **PlantUML**: Visual class diagram with modules as packages
+- **Visual module boundaries** with color-coded classes and cohesion metrics
+- **Detailed results** showing module distribution and cohesion values
+- **Terminal UI integration** with interactive module extraction workflow
+- See [MODULE_EXTRACTION_GUIDE.md](MODULE_EXTRACTION_GUIDE.md) for complete guide
 
 ### �📈 Project Statistics
 - **13 comprehensive metrics** including:
@@ -52,6 +81,7 @@ A comprehensive Java analysis tool that generates call graphs, class diagrams, a
 ### Prerequisites
 - Java 17 or higher
 - Maven 3.6 or higher
+- (Optional) Graphviz for visualizations
 
 ### Installation
 
@@ -61,29 +91,50 @@ git clone https://github.com/jeremyhurel/java-refactoring-tool.git
 cd java-refactoring-tool
 ```
 
-2. Build the project:
+2. Build and run with the convenient script:
 ```bash
-mvn clean package
+./run.sh
 ```
 
-3. Run the application:
+Or manually:
 ```bash
-java -jar target/java-refactoring-tool-1.0-SNAPSHOT-jar-with-dependencies.jar
+mvn clean package
+java -jar target/java-refactoring-tool-1.1-SNAPSHOT-jar-with-dependencies.jar
 ```
+
+### Run Commands
+
+The project includes a convenient `run.sh` script for all common operations:
+
+```bash
+./run.sh              # Run the application (builds if needed)
+./run.sh build        # Build the project
+./run.sh test         # Run tests
+./run.sh export       # Generate test exports
+./run.sh visualize    # Create PNG/SVG from DOT files
+./run.sh full         # Complete workflow (clean, build, test, export, visualize)
+./run.sh help         # Show all available commands
+```
+
+See [RUN_COMMANDS.md](RUN_COMMANDS.md) for complete documentation.
 
 ### Usage
 
-1. **Interactive Mode**: Run the JAR file and follow the terminal UI
+1. **Interactive Mode**: Run the application and use the terminal UI
+   ```bash
+   ./run.sh
+   ```
+
 2. **Command Line Examples**:
    ```bash
-   # Generate call graph
-   java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestDotExport
+   # Generate test exports
+   ./run.sh export
    
-   # Generate class diagram
-   java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestClassDiagramExport
+   # Create visualizations
+   ./run.sh visualize
    
-   # Generate statistics
-   java -cp target/java-refactoring-tool-1.0-SNAPSHOT.jar fr.jeremyhurel.test.TestStatisticsExport
+   # Complete workflow
+   ./run.sh full
    ```
 
 ## Output Formats
