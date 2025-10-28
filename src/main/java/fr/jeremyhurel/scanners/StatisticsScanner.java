@@ -1,10 +1,21 @@
 package fr.jeremyhurel.scanners;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import fr.jeremyhurel.models.MethodStats;
+import fr.jeremyhurel.models.class_models.ClassStats;
 import spoon.processing.AbstractProcessor;
-import spoon.reflect.declaration.*;
 import spoon.reflect.code.CtStatement;
-import fr.jeremyhurel.models.*;
-import java.util.*;
+import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.ModifierKind;
 
 public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
 
@@ -23,22 +34,17 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
         String className = type.getSimpleName();
         String packageName = type.getPackage().getQualifiedName();
 
-        // Add package to set
         packages.add(packageName);
 
-        // Create class statistics
         ClassStats classStats = new ClassStats(className, packageName);
         classStats.setInterface(type.isInterface());
         classStats.setAbstract(type.hasModifier(ModifierKind.ABSTRACT));
 
-        // Count attributes
         classStats.setAttributeCount(type.getFields().size());
 
-        // Count methods and analyze them
         int methodCount = 0;
         int totalClassLinesOfCode = 0;
 
-        // Process methods
         for (CtMethod<?> method : type.getMethods()) {
             methodCount++;
             MethodStats methodStats = processMethod(method, className, packageName);
@@ -46,7 +52,6 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
             totalClassLinesOfCode += methodStats.getLinesOfCode();
         }
 
-        // Process constructors (only for classes)
         if (type instanceof CtClass) {
             CtClass<?> ctClass = (CtClass<?>) type;
             for (CtConstructor<?> constructor : ctClass.getConstructors()) {
@@ -67,17 +72,14 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
         String methodName = method.getSimpleName();
         MethodStats methodStats = new MethodStats(methodName, className, packageName);
 
-        // Set method properties
         methodStats.setReturnType(method.getType().getSimpleName());
         methodStats.setVisibility(getVisibility(method.getModifiers()));
         methodStats.setStatic(method.hasModifier(ModifierKind.STATIC));
         methodStats.setAbstract(method.hasModifier(ModifierKind.ABSTRACT));
         methodStats.setConstructor(false);
 
-        // Count parameters
         methodStats.setParameterCount(method.getParameters().size());
 
-        // Count lines of code
         int linesOfCode = countLinesOfCode(method.getBody());
         methodStats.setLinesOfCode(linesOfCode);
 
@@ -87,17 +89,14 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
     private MethodStats processConstructor(CtConstructor<?> constructor, String className, String packageName) {
         MethodStats constructorStats = new MethodStats(className, className, packageName);
 
-        // Set constructor properties
         constructorStats.setReturnType("");
         constructorStats.setVisibility(getVisibility(constructor.getModifiers()));
         constructorStats.setStatic(false);
         constructorStats.setAbstract(false);
         constructorStats.setConstructor(true);
 
-        // Count parameters
         constructorStats.setParameterCount(constructor.getParameters().size());
 
-        // Count lines of code
         int linesOfCode = countLinesOfCode(constructor.getBody());
         constructorStats.setLinesOfCode(linesOfCode);
 
@@ -129,7 +128,6 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
         if (statement == null)
             return 0;
 
-        // Simple line counting based on source position
         if (statement.getPosition() != null && statement.getPosition().isValidPosition()) {
             int startLine = statement.getPosition().getLine();
             int endLine = statement.getPosition().getEndLine();
@@ -138,13 +136,12 @@ public class StatisticsScanner extends AbstractProcessor<CtType<?>> {
             }
         }
 
-        // Fallback: count newlines in string representation
         String statementStr = statement.toString();
         if (statementStr != null && !statementStr.trim().isEmpty()) {
             return Math.max(1, statementStr.split("\n").length);
         }
 
-        return 1; // At least 1 line per statement
+        return 1;
     }
 
     public Map<String, ClassStats> getClassStatsMap() {

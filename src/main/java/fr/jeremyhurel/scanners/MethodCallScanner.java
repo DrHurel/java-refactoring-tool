@@ -25,7 +25,7 @@ public class MethodCallScanner extends AbstractProcessor<CtMethod<?>> {
 
     @Override
     public void process(CtMethod<?> method) {
-        // Skip if we're filtering by root method and this isn't it
+
         if (rootClassName != null && rootMethodName != null) {
             String currentClassName = method.getDeclaringType().getQualifiedName();
             String currentMethodName = method.getSimpleName();
@@ -42,14 +42,12 @@ public class MethodCallScanner extends AbstractProcessor<CtMethod<?>> {
 
         CalleeGraphNode currentNode = callGraph.getOrCreateNode(className, methodName, signature, lineNumber);
 
-        // Set as root if this is the first node or if it matches the root criteria
         if (callGraph.getRootNode() == null ||
                 (rootClassName != null && rootMethodName != null &&
                         className.equals(rootClassName) && methodName.equals(rootMethodName))) {
             callGraph.setRootNode(currentNode);
         }
 
-        // Find all method invocations within this method
         method.getElements(new TypeFilter<>(CtInvocation.class)).forEach(invocation -> {
             try {
                 String targetClassName = invocation.getExecutable().getDeclaringType().getQualifiedName();
@@ -62,7 +60,7 @@ public class MethodCallScanner extends AbstractProcessor<CtMethod<?>> {
 
                 currentNode.addCallee(targetNode);
             } catch (Exception e) {
-                // Skip invocations that can't be resolved (e.g., library calls)
+
                 System.err.println("Could not resolve method call: " + invocation);
             }
         });

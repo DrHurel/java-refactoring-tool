@@ -1,10 +1,21 @@
 package fr.jeremyhurel.scanners;
 
-import spoon.processing.AbstractProcessor;
-import spoon.reflect.declaration.*;
-import spoon.reflect.reference.CtTypeReference;
-import fr.jeremyhurel.models.*;
 import java.util.Set;
+
+import fr.jeremyhurel.models.class_models.ClassAttr;
+import fr.jeremyhurel.models.class_models.ClassDiagram;
+import fr.jeremyhurel.models.class_models.ClassDiagramNode;
+import fr.jeremyhurel.models.class_models.ClassMethod;
+import fr.jeremyhurel.models.class_models.ClassRelationship;
+import spoon.processing.AbstractProcessor;
+import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
+import spoon.reflect.declaration.CtField;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.ModifierKind;
+import spoon.reflect.reference.CtTypeReference;
 
 public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
 
@@ -22,7 +33,7 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
 
     @Override
     public void process(CtType<?> type) {
-        // Skip if we're filtering by root package and this doesn't match
+
         if (rootPackage != null && !type.getPackage().getQualifiedName().startsWith(rootPackage)) {
             return;
         }
@@ -32,16 +43,13 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
 
         ClassDiagramNode classNode = classDiagram.getOrCreateClass(className, packageName);
 
-        // Set class type information
         classNode.setInterface(type.isInterface());
         classNode.setAbstract(type.hasModifier(ModifierKind.ABSTRACT));
 
-        // Process superclass
         if (type.getSuperclass() != null) {
             String superClassName = type.getSuperclass().getQualifiedName();
             classNode.setSuperClass(superClassName);
 
-            // Add inheritance relationship
             ClassRelationship inheritance = new ClassRelationship(
                     classNode.getFullName(),
                     superClassName,
@@ -49,12 +57,10 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
             classDiagram.addRelationship(inheritance);
         }
 
-        // Process interfaces
         for (CtTypeReference<?> interfaceRef : type.getSuperInterfaces()) {
             String interfaceName = interfaceRef.getQualifiedName();
             classNode.addInterface(interfaceName);
 
-            // Add implementation relationship
             ClassRelationship implementation = new ClassRelationship(
                     classNode.getFullName(),
                     interfaceName,
@@ -62,17 +68,14 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
             classDiagram.addRelationship(implementation);
         }
 
-        // Process fields/attributes
         for (CtField<?> field : type.getFields()) {
             processField(classNode, field);
         }
 
-        // Process methods
         for (CtMethod<?> method : type.getMethods()) {
             processMethod(classNode, method);
         }
 
-        // Process constructors (only for classes, not interfaces)
         if (type instanceof CtClass) {
             CtClass<?> ctClass = (CtClass<?>) type;
             for (CtConstructor<?> constructor : ctClass.getConstructors()) {
@@ -92,7 +95,6 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
 
         classNode.addAttribute(attribute);
 
-        // Check for composition/aggregation relationships
         if (!isPrimitiveType(fieldType)) {
             String targetClass = field.getType().getQualifiedName();
             ClassRelationship.RelationType relType = field.hasModifier(ModifierKind.FINAL)
@@ -117,7 +119,6 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
         classMethod.setStatic(method.hasModifier(ModifierKind.STATIC));
         classMethod.setAbstract(method.hasModifier(ModifierKind.ABSTRACT));
 
-        // Add parameters
         for (CtParameter<?> param : method.getParameters()) {
             String paramType = param.getType().getSimpleName();
             String paramName = param.getSimpleName();
@@ -133,7 +134,6 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
         ClassMethod classMethod = new ClassMethod(classNode.getClassName(), "", visibility);
         classMethod.setConstructor(true);
 
-        // Add parameters
         for (CtParameter<?> param : constructor.getParameters()) {
             String paramType = param.getType().getSimpleName();
             String paramName = param.getSimpleName();
@@ -150,7 +150,7 @@ public class ClassDiagramScanner extends AbstractProcessor<CtType<?>> {
             return "-";
         if (modifiers.contains(ModifierKind.PROTECTED))
             return "#";
-        return "~"; // package-private
+        return "~";
     }
 
     private boolean isPrimitiveType(String type) {
